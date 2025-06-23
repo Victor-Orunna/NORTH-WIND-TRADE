@@ -1,4 +1,5 @@
-# SALES ANALYSIS
+# NORTH-WIND TRADE SALES ANALYSIS
+![NORTHWIND](https://github.com/user-attachments/assets/e00644d9-1cae-44d7-9c51-b7adae9078ca)
 
 ### PROJECT OVERVIEW
 
@@ -188,6 +189,43 @@ exec sp_rename 'shippers.companyName','Company_Name','Column';
 ## SALES INSIGHTS
 - TOTAL SALES OR REVENUE GENERATED, QUANTITY SOLD, ORDER PLACED, TOTAL DISCOUNT
 
+```sql
+select sum(Revenue) as Total_Revenue, sum(Total_Quantity) as Quantity_Sold,
+		sum(Total_Order) as Order_Placed, sum(Total_Discount) as Total_Discount
+from(select Year(Order_Date) as Year,sum(Amount) Revenue, sum(Quantity) as Total_Quantity, 
+		sum(Discount) as Total_Discount, count(Order_ID) Total_Order
+	from(select Order_Date, Order_ID,Customer_ID,A.Product_ID,Product_Name,Selling_Price = A.Unit_Price, 
+		Actual_Unit_Price = P.Unit_Price, Quantity, Amount, round(P.Unit_Price - A.Unit_price,2) as Discount, Freight
+		from(select Order_Date, O.Order_ID, Customer_ID,Product_ID, round(Unit_Price,2) as Unit_price, Quantity,
+		Employee_ID, round(Quantity * Unit_Price,2) as Amount, Discount, round(Freight,2)Freight
+			from orders O
+			join order_details OD
+			on O.Order_ID = OD.Order_ID) A 
+		join (select * from Products) P
+		on A.Product_ID = P.Product_ID) B
+	group by Year(Order_Date)) C;
+```
+![TOTAL SALES](https://github.com/user-attachments/assets/b76a6208-fb8f-4f45-b5e6-a813f14acaff)
+
+![TOTAL SALES_1](https://github.com/user-attachments/assets/95d138c2-4dfa-4f48-8634-c8c57edcd647)
+
+- SALES TREND
+```sql
+select Year(Order_Date) as Year,sum(Amount) Revenue, sum(Quantity) as Total_Quantity, 
+		sum(Discount) as Total_Discount, count(Order_ID) Total_Order
+from(select Order_Date, Order_ID,Customer_ID,A.Product_ID,Product_Name,Selling_Price = A.Unit_Price, 
+		Actual_Unit_Price = P.Unit_Price, Quantity, Amount, round(P.Unit_Price - A.Unit_price,2) as Discount, Freight
+	from(select Order_Date, O.Order_ID, Customer_ID,Product_ID, round(Unit_Price,2) as Unit_price, Quantity,
+		Employee_ID, round(Quantity * Unit_Price,2) as Amount, Discount, round(Freight,2)Freight
+		from orders O
+		join order_details OD
+		on O.Order_ID = OD.Order_ID) A 
+	join (select * from Products) P
+	on A.Product_ID = P.Product_ID) B
+group by Year(Order_Date) 
+order by Year asc;
+```
+![SALES TREND](https://github.com/user-attachments/assets/bfed429a-1820-4034-9a76-e7022ab8e756)
 
 
 
